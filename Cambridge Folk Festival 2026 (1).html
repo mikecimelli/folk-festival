@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Folk Fest">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="format-detection" content="telephone=no">
+<title>Cambridge Folk Festival</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #ff6b6b;
+            --accent-success: #51cf66;
+            --accent-warning: #ffd43b;
+            --accent-danger: #ff6b6b;
+            --accent-blue: #4dabf7;
+            --border: #333333;
+            --header-height: 160px;
+        }
+
+        html {
+            background: var(--bg-primary);
+            height: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            overscroll-behavior-y: none;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100%;
+            min-height: 100dvh;
+        }
+
+        button, input, textarea {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        button {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left));
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sticky-day-header {
+            position: sticky;
+            top: var(--header-height);
+            background: var(--bg-primary);
+            z-index: 50;
+            padding-bottom: 8px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px 0 10px;
+            margin: 0;
+        }
+
+        .first-pick-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-success);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .first-pick-box strong {
+            color: var(--accent);
+        }
+
+        .first-pick-box.first-pick-empty {
+            border-left-color: var(--border);
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .pick-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pick-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pick-now {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        #now-playing-btn {
+            flex-shrink: 0;
+            white-space: nowrap;
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 4px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-tertiary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .day-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .day-tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .day-tab-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .day-tab-text {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .day-tab-title {
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .day-tab-subtitle {
+            font-size: 10px;
+            font-weight: 500;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .day-tab.active {
+            background: var(--accent-blue);
+            color: #fff;
+            border-color: var(--accent-blue);
+        }
+
+        .day-tab:active {
+            transform: scale(0.97);
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .action-btn:active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .filter-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .filter-btn:active {
+            transform: scale(0.95);
+        }
+
+        .filter-btn span {
+            margin-left: 3px;
+            font-size: 11px;
+            font-weight: 700;
+            opacity: 0.75;
+        }
+
+        .filter-btn.active span {
+            display: inline-block;
+            min-width: 14px;
+            padding: 0 4px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.25);
+            opacity: 1;
+        }
+
+        .timeline-vwrap {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 16px;
+        }
+
+        .timeline-vheader {
+            display: flex;
+            margin-bottom: 4px;
+        }
+
+        .timeline-vheader-spacer {
+            width: 40px;
+            flex-shrink: 0;
+        }
+
+        .timeline-vcol-title {
+            flex: 1;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .timeline-vbody {
+            position: relative;
+            display: flex;
+        }
+
+        .timeline-vruler {
+            position: relative;
+            width: 40px;
+            flex-shrink: 0;
+        }
+
+        .timeline-vruler-label {
+            position: absolute;
+            left: 0;
+            font-size: 9px;
+            color: var(--text-secondary);
+            transform: translateY(-50%);
+            white-space: nowrap;
+        }
+
+        .timeline-vruler-tick {
+            position: absolute;
+            left: 34px;
+            width: 6px;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .timeline-vgridline {
+            position: absolute;
+            left: 40px;
+            right: 0;
+            height: 1px;
+            background: var(--border);
+            opacity: 0.35;
+        }
+
+        .timeline-vcol {
+            position: relative;
+            flex: 1;
+            border-left: 1px solid var(--border);
+        }
+
+        .timeline-vblock {
+            position: absolute;
+            left: 3px;
+            right: 3px;
+            border-radius: 6px;
+            padding: 2px 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.15s, opacity 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .timeline-vblock:active {
+            transform: scale(0.96);
+        }
+
+        .timeline-vblock.status-yes { background: var(--accent-success); color: #fff; }
+        .timeline-vblock.status-maybe { background: var(--accent-warning); color: #000; }
+        .timeline-vblock.status-no { background: var(--accent-danger); color: #fff; opacity: 0.6; }
+        .timeline-vblock.status-none { background: var(--bg-tertiary); color: var(--text-secondary); border-color: var(--border); }
+
+        .tvb-name {
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.15;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tvb-time {
+            font-size: 8px;
+            opacity: 0.85;
+            margin-top: 1px;
+            white-space: nowrap;
+        }
+
+        .tvb-notes {
+            font-size: 8px;
+            margin-top: 3px;
+            font-style: italic;
+            opacity: 0.95;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .timeline-now-line {
+            position: absolute;
+            left: 40px;
+            right: 0;
+            height: 2px;
+            background: var(--accent);
+            z-index: 5;
+        }
+
+        .timeline-now-label {
+            position: absolute;
+            left: 4px;
+            top: -8px;
+            font-size: 8px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--accent);
+            padding: 1px 4px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        .timeline-vblock.dimmed {
+            opacity: 0.2 !important;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 16px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+            padding-top: 0;
+        }
+
+        .day-section {
+            margin-bottom: 32px;
+        }
+
+        .day-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--accent);
+            padding: 8px 0;
+        }
+
+        .status-cycle {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .status-btn {
+            flex: 1;
+            padding: 8px 4px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-btn.active {
+            background: var(--accent-success);
+            color: white;
+            border-color: var(--accent-success);
+        }
+
+        .status-btn:nth-child(2).active {
+            background: var(--accent-warning);
+            color: #000;
+            border-color: var(--accent-warning);
+        }
+
+        .status-btn:nth-child(3).active {
+            background: var(--accent-danger);
+            color: white;
+            border-color: var(--accent-danger);
+        }
+
+        .status-btn:active {
+            transform: scale(0.95);
+        }
+
+        .notes-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .notes-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .notes-input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            resize: none;
+            min-height: 40px;
+            max-height: 80px;
+        }
+
+        .notes-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .notes-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-tertiary);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .links {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .link-btn {
+            flex: 1;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .link-btn:active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+
+        @media (max-width: 320px) {
+            .status-btn {
+                padding: 6px 2px;
+                font-size: 10px;
+            }
+        }
+
+        .sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s;
+            z-index: 200;
+        }
+
+        .sheet-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            max-height: 82vh;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            border-radius: 20px 20px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 201;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            padding: 12px max(20px, env(safe-area-inset-right)) max(28px, calc(env(safe-area-inset-bottom) + 16px)) max(20px, env(safe-area-inset-left));
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .bottom-sheet.show {
+            transform: translateY(0);
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 0 auto 14px;
+        }
+
+        .sheet-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .sheet-time {
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .sheet-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            padding-right: 36px;
+        }
+
+
+        .sheet-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .sheet-status {
+            margin: 4px 0 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            🎵 Cambridge Folk Festival
+            <div style="position: relative; display: inline-block; margin-left: 8px;">
+                <button class="action-btn" id="notification-btn" style="position: relative;">🔔</button>
+                <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+            </div>
+        </div>
+        <div class="day-tabs" id="day-tabs">
+            <button class="day-tab active" data-day="Saturday 1 August">
+                <span class="day-tab-icon" id="weather-icon-sat">🌐</span>
+                <span class="day-tab-text">
+                    <span class="day-tab-title">Saturday 1 Aug</span>
+                    <span class="day-tab-subtitle" id="weather-desc-sat">Forecast unavailable</span>
+                </span>
+            </button>
+            <button class="day-tab" data-day="Sunday 2 August">
+                <span class="day-tab-icon" id="weather-icon-sun">🌐</span>
+                <span class="day-tab-text">
+                    <span class="day-tab-title">Sunday 2 Aug</span>
+                    <span class="day-tab-subtitle" id="weather-desc-sun">Forecast unavailable</span>
+                </span>
+            </button>
+        </div>
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="search-input" placeholder="Search artists...">
+        </div>
+    </div>
+
+    <div class="container" id="schedule"></div>
+
+    <div class="sheet-overlay" id="sheet-overlay"></div>
+    <div class="bottom-sheet" id="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <button class="sheet-close" id="sheet-close">✕</button>
+        <div id="sheet-content"></div>
+    </div>
+
+    <script>
+        // Festival schedule data - Cambridge Folk Festival 2026 (Real Times)
+        const schedule = {
+            'Saturday 1 August': [
+                {
+                    id: 'sat-1',
+                    name: 'Nick Cope',
+                    start: '11:00',
+                    end: '12:00',
+                    stage: 'Stage 1',
+                    rating: 3,
+                    genre: 'Children\'s Folk',
+                    country: 'UK',
+                    soundsLike: 'Show of Hands',
+                    description: 'Beloved children\'s musician and storyteller creating fun, engaging family folk.',
+                    reason: 'Perfect for families and kids. Interactive and entertaining.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sat-2',
+                    name: 'Amaidí',
+                    start: '12:15',
+                    end: '13:15',
+                    stage: 'Stage 1',
+                    rating: 4,
+                    genre: 'Neo-Trad',
+                    country: 'Australia',
+                    soundsLike: 'Lankum, Skerryvore, traditional trad',
+                    description: 'Australian neo-trad band blending Irish, Scottish and Australian folk with pumping modern arrangements. Heavy bass and driving energy.',
+                    reason: 'Exciting modern take on traditional music. High energy and fun.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sat-3',
+                    name: 'Ustad Noor Bakhsh',
+                    start: '13:30',
+                    end: '14:30',
+                    stage: 'Stage 1',
+                    rating: 5,
+                    genre: 'Balochi Traditional',
+                    country: 'Pakistan',
+                    soundsLike: 'World music, traditional Balochi benju',
+                    description: 'Master musician from Balochistan playing the electric benju (keyed zither). Discovered at 77, blending Balochi tradition with South Asian and Persian influences.',
+                    reason: 'Extraordinary and rare musician. Pitchfork praised him as spiritual and indefinable.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sat-4',
+                    name: 'Frog on a Bike with Mary Panton',
+                    start: '14:45',
+                    end: '15:30',
+                    stage: 'Stage 1',
+                    rating: 4,
+                    genre: 'English Ceilidh',
+                    country: 'UK',
+                    soundsLike: 'Show of Hands, Bellowhead',
+                    description: 'East of England\'s premier English ceilidh band. Frenetic energy, folk-rock sound with melodeon, recorder, fiddle and driving rhythm section.',
+                    reason: 'East Anglia\'s best ceilidh band. Fun, energetic, gets everyone dancing.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-5',
+                    name: 'The Songs of Joni Mitchell (Jesca Hoop & guests)',
+                    start: '16:15',
+                    end: '17:15',
+                    stage: 'Stage 1',
+                    rating: 5,
+                    genre: 'Folk',
+                    country: 'USA',
+                    soundsLike: 'Joni Mitchell, Iron & Wine',
+                    description: 'Tributo to Joni Mitchell featuring Jesca Hoop and special guests.',
+                    reason: 'Incredible tribute to a folk legend. Must-see.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sat-6',
+                    name: 'Skinny Lister',
+                    start: '17:30',
+                    end: '18:20',
+                    stage: 'Stage 1',
+                    rating: 4,
+                    genre: 'Folk-Punk',
+                    country: 'England',
+                    soundsLike: 'The Pogues, Gogol Bordello, Show of Hands',
+                    description: 'London folk-punk band (est. 2009) with raucous energy, high-octane performances and frenetic live shows. Called "Hardest Working Band in the UK."',
+                    reason: 'Non-stop energy and party vibes. Infectious and fun.',
+                    duration: '50 mins'
+                },
+                {
+                    id: 'sat-7',
+                    name: 'Seth Lakeman',
+                    start: '19:00',
+                    end: '19:50',
+                    stage: 'Stage 1',
+                    rating: 4,
+                    genre: 'Folk',
+                    country: 'USA',
+                    soundsLike: 'Josh Ritter, Sturgill Simpson, Jason Isbell',
+                    description: 'Vermont folk musician with powerful vocals and storytelling.',
+                    reason: 'Masterful fingerpicking and soulful vocals. Deeply moving.',
+                    duration: '50 mins'
+                },
+                {
+                    id: 'sat-8',
+                    name: 'Frank Turner',
+                    start: '20:30',
+                    end: '21:45',
+                    stage: 'Stage 1',
+                    rating: 5,
+                    genre: 'Folk Rock',
+                    country: 'UK',
+                    soundsLike: 'The Replacements, Stornoway, Show of Hands',
+                    description: 'Charismatic folk-rock troubadour. Infectious energy and audience participation.',
+                    reason: '🎵 HEADLINER. Always delivers. One of the best live acts.',
+                    duration: '75 mins'
+                },
+                {
+                    id: 'sat-13',
+                    name: 'Cambridgeshire Summer School',
+                    start: '11:45',
+                    end: '12:30',
+                    stage: 'Stage 2',
+                    rating: 2,
+                    genre: 'Youth Folk Ensemble',
+                    country: 'UK',
+                    soundsLike: 'Community folk ensembles',
+                    description: 'Young musicians aged 11-18 performing after a four-day intensive folk course run by Cambridgeshire Music with festival tutors.',
+                    reason: 'Charming showcase of the next generation of folk musicians.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-14',
+                    name: 'Katacombs',
+                    start: '13:00',
+                    end: '13:45',
+                    stage: 'Stage 2',
+                    rating: 3,
+                    genre: 'Dark Alt-Folk',
+                    country: 'USA/UK',
+                    soundsLike: 'Amigo the Devil, Angel Olsen',
+                    description: 'Solo project blending Spanish and Greek heritage with Austin/London roots. Keyboardist for Amigo the Devil, released debut album "Fragments of the Underwater" in 2025.',
+                    reason: 'Atmospheric and moody. A different flavour on the bill.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-15',
+                    name: 'Maddie Morris',
+                    start: '14:15',
+                    end: '15:00',
+                    stage: 'Stage 2',
+                    rating: 4,
+                    genre: 'Contemporary Folk',
+                    country: 'UK',
+                    soundsLike: 'Nancy Kerr, Grace Petrie, Jim Moray',
+                    description: 'BBC Radio 2 Young Folk Award winner (2019). Socially-conscious songwriting that takes traditional song in new directions, tackling identity, poverty and social justice.',
+                    reason: 'Haunting voice and a genuine new folk talent. Worth catching.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-9',
+                    name: 'Amelia Coburn',
+                    start: '15:45',
+                    end: '16:30',
+                    stage: 'Stage 2',
+                    rating: 4,
+                    genre: 'Traditional Folk',
+                    country: 'UK',
+                    soundsLike: 'Nancy Kerr, Eliza Carthy, Kate Rusby',
+                    description: 'Young traditional folk singer with luminous voice.',
+                    reason: 'Beautiful voice and authentic approach. Special performer.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-10',
+                    name: 'Nick Harper',
+                    start: '17:00',
+                    end: '18:00',
+                    stage: 'Stage 2',
+                    rating: 4,
+                    genre: 'Folk Rock',
+                    country: 'UK',
+                    soundsLike: 'Richard Thompson, Paul Simon, Loudon Wainwright',
+                    description: 'Virtuoso acoustic guitarist with intricate fingerpicking.',
+                    reason: 'Masterful musician. Incredible skill and artistry.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sat-11',
+                    name: 'Man the Lifeboats',
+                    start: '18:30',
+                    end: '19:30',
+                    stage: 'Stage 2',
+                    rating: 3,
+                    genre: 'Folk/Indie',
+                    country: 'UK',
+                    soundsLike: 'The National, Allo Darlink',
+                    description: 'Indie folk with powerful arrangements.',
+                    reason: 'Great contemporary folk. Interesting arrangements.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sat-12',
+                    name: 'RuMac',
+                    start: '19:45',
+                    end: '20:35',
+                    stage: 'Stage 2',
+                    rating: 4,
+                    genre: 'Scottish Folk',
+                    country: 'Scotland',
+                    soundsLike: 'Dick Gaughan, Norma Waterson, Eddi Reader',
+                    description: 'Traditional Scottish folk with contemporary sensibility.',
+                    reason: 'Authentic folk with infectious energy and warmth.',
+                    duration: '50 mins'
+                },
+                {
+                    id: 'sat-16',
+                    name: 'BBC Introducing',
+                    start: '10:30',
+                    end: '11:15',
+                    stage: 'Club Corner',
+                    rating: 2,
+                    genre: 'Emerging Artists Showcase',
+                    country: 'UK',
+                    soundsLike: 'BBC Introducing new music sessions',
+                    description: 'Showcase of emerging talent championed by BBC Introducing.',
+                    reason: 'Good way to discover new artists early in the day.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-17',
+                    name: 'New Routes',
+                    start: '14:30',
+                    end: '15:15',
+                    stage: 'Club Corner',
+                    rating: 2,
+                    genre: 'Folk Collective',
+                    country: 'UK',
+                    soundsLike: 'Emerging folk collectives',
+                    description: 'Collective spotlighting fresh voices and new directions in folk music.',
+                    reason: 'Intimate club-style setting away from the main stages.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-18',
+                    name: 'Cambridge Folk Club',
+                    start: '18:00',
+                    end: '18:45',
+                    stage: 'Club Corner',
+                    rating: 2,
+                    genre: 'Folk Club Session',
+                    country: 'UK',
+                    soundsLike: 'Local folk club nights',
+                    description: 'The festival\'s own folk club bringing the intimate, sociable feel of a traditional folk club night to Cherry Hinton Hall.',
+                    reason: 'A cosy, community alternative to the main stages.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-19',
+                    name: 'Singing Sessions with Black Fen',
+                    start: '13:45',
+                    end: '14:30',
+                    stage: 'Flower Garden',
+                    rating: 2,
+                    genre: 'Participatory Singing',
+                    country: 'UK',
+                    soundsLike: 'Community singing sessions',
+                    description: 'Join Black Fen for an informal, participatory singing session in the Flower Garden.',
+                    reason: 'Fun, relaxed way to join in rather than just watch.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sat-20',
+                    name: 'Traditional Singing with Tim Mellor',
+                    start: '17:15',
+                    end: '18:00',
+                    stage: 'Flower Garden',
+                    rating: 2,
+                    genre: 'Traditional Singing Session',
+                    country: 'UK',
+                    soundsLike: 'Traditional English singing sessions',
+                    description: 'A relaxed traditional singing session led by Tim Mellor in the Flower Garden.',
+                    reason: 'Lovely, low-key way to unwind between main-stage sets.',
+                    duration: '45 mins'
+                }
+            ],
+            'Sunday 2 August': [
+                {
+                    id: 'sun-1',
+                    name: 'Christina Alden & Alex Patterson',
+                    start: '11:00',
+                    end: '12:00',
+                    stage: 'Stage 1',
+                    rating: 3,
+                    genre: 'Americana',
+                    country: 'USA',
+                    soundsLike: 'Punch Brothers, Mandolin Orange',
+                    description: 'Dynamic duo with tight harmonies and beautiful instrumentation.',
+                    reason: 'Beautiful morning performance to start the day.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sun-2',
+                    name: 'George Boomsma',
+                    start: '12:15',
+                    end: '13:15',
+                    stage: 'Stage 1',
+                    rating: 3,
+                    genre: 'Folk',
+                    country: 'Netherlands',
+                    soundsLike: 'Townes Van Zandt, John Prine',
+                    description: 'Dutch folk singer-songwriter with poetic sensibility.',
+                    reason: 'Intimate and thoughtful folk songs.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sun-3',
+                    name: 'The Thorn',
+                    start: '13:30',
+                    end: '14:30',
+                    stage: 'Stage 1',
+                    rating: 3,
+                    genre: 'Folk',
+                    country: 'UK',
+                    soundsLike: 'Atta Boy, The Young Folk',
+                    description: 'UK folk collective with lush arrangements.',
+                    reason: 'Great afternoon set with interesting arrangements.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sun-4',
+                    name: 'The Deep Blue',
+                    start: '14:45',
+                    end: '15:25',
+                    stage: 'Stage 1',
+                    rating: 3,
+                    genre: 'Folk/Indie',
+                    country: 'UK',
+                    soundsLike: 'Frightened Rabbit, The National',
+                    description: 'Indie folk band with emotional depth.',
+                    reason: 'Contemporary folk with real character.',
+                    duration: '40 mins'
+                },
+                {
+                    id: 'sun-5',
+                    name: 'Brògeal',
+                    start: '16:00',
+                    end: '17:00',
+                    stage: 'Stage 1',
+                    rating: 4,
+                    genre: 'Gaelic Folk',
+                    country: 'Scotland',
+                    soundsLike: 'Breabach, Capercaillie, Hò-Rò',
+                    description: 'Dynamic Scottish Gaelic folk band with traditional roots.',
+                    reason: 'Beautiful traditional Gaelic music with modern energy.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sun-6',
+                    name: 'This Is The Kit',
+                    start: '17:30',
+                    end: '18:25',
+                    stage: 'Stage 1',
+                    rating: 5,
+                    genre: 'Alternative Folk',
+                    country: 'England',
+                    soundsLike: 'Bon Iver, Gruff Rhys, Nick Drake',
+                    description: 'Winchester-based project of Kate Stables with revolving lineup. Innovative songwriting, tender and fragile. Nominated for Ivor Novello award. Entrancing live performances.',
+                    reason: 'Standout live act. Innovative and utterly captivating. Highly recommended.',
+                    duration: '55 mins'
+                },
+                {
+                    id: 'sun-7',
+                    name: 'Suzanne Vega',
+                    start: '19:00',
+                    end: '20:30',
+                    stage: 'Stage 1',
+                    rating: 5,
+                    genre: 'Folk Singer-Songwriter',
+                    country: 'USA',
+                    soundsLike: 'Tom Waits, Leonard Cohen, Joni Mitchell',
+                    description: 'Iconic singer-songwriter. Introspective lyrics and poetic storytelling.',
+                    reason: '🎵 HEADLINER. Modern folk legend. Iconic voice and artistry.',
+                    duration: '90 mins'
+                },
+                {
+                    id: 'sun-8',
+                    name: 'Richard Thompson with Zara Phillips',
+                    start: '20:45',
+                    end: '22:00',
+                    stage: 'Stage 1',
+                    rating: 5,
+                    genre: 'Folk Rock',
+                    country: 'UK',
+                    soundsLike: 'Fairport Convention, Led Zeppelin, Nick Drake',
+                    description: 'Legendary guitarist. Masterclass in folk-rock and technical brilliance.',
+                    reason: '🎵 HEADLINER. Rock legend. Incredible skill. Must-see.',
+                    duration: '75 mins'
+                },
+                {
+                    id: 'sun-9',
+                    name: 'Lally MacBeth: The Lost Folk',
+                    start: '11:45',
+                    end: '12:45',
+                    stage: 'Stage 2',
+                    rating: 3,
+                    genre: 'Theatre Folk',
+                    country: 'UK',
+                    soundsLike: 'The Pogues, Hadestown',
+                    description: 'Theatrical folk performance about Scottish folk traditions.',
+                    reason: 'Unique theatrical folk experience.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sun-10',
+                    name: 'Tom Jenkins',
+                    start: '13:00',
+                    end: '14:00',
+                    stage: 'Stage 2',
+                    rating: 3,
+                    genre: 'Folk',
+                    country: 'UK',
+                    soundsLike: 'Paul Brady, John Martyn',
+                    description: 'Singer-songwriter with traditional roots and modern sensibility.',
+                    reason: 'Thoughtful folk music with strong songwriting.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sun-11',
+                    name: 'Katie Spencer',
+                    start: '14:15',
+                    end: '15:00',
+                    stage: 'Stage 2',
+                    rating: 4,
+                    genre: 'Folk',
+                    country: 'UK',
+                    soundsLike: 'Hozier, Daughter, Bear\'s Den',
+                    description: 'Talented folk musician with distinctive voice and storytelling.',
+                    reason: 'Intimate yet powerful performances. Highly recommended.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sun-14',
+                    name: 'Frog on a Bike with Mary Panton',
+                    start: '15:30',
+                    end: '16:15',
+                    stage: 'Stage 2',
+                    rating: 4,
+                    genre: 'English Ceilidh',
+                    country: 'UK',
+                    soundsLike: 'Show of Hands, Bellowhead',
+                    description: 'East of England\'s premier English ceilidh band returns for a second set. Frenetic energy and driving rhythm.',
+                    reason: 'Great fun, gets everyone up dancing again.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sun-12',
+                    name: 'Ollie Cook & The Hogwash',
+                    start: '17:00',
+                    end: '18:00',
+                    stage: 'Stage 2',
+                    rating: 3,
+                    genre: 'Folk Swing',
+                    country: 'UK',
+                    soundsLike: 'Show of Hands, The Unthanks',
+                    description: 'Folk swing band with fun arrangements.',
+                    reason: 'Great energy and fun set.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sun-13',
+                    name: 'Mark Radcliffe & David Boardman',
+                    start: '18:30',
+                    end: '19:45',
+                    stage: 'Stage 2',
+                    rating: 4,
+                    genre: 'Folk',
+                    country: 'UK',
+                    soundsLike: 'Fairport Convention, Steeleye Span',
+                    description: 'BBC Radio folk legend and collaborator. Masterful storytelling.',
+                    reason: 'Highly respected musicians. Intimate evening set.',
+                    duration: '75 mins'
+                },
+                {
+                    id: 'sun-15',
+                    name: 'Felicity Ward, Mark Watson & Matt Bragg (Comedy)',
+                    start: '20:00',
+                    end: '21:00',
+                    stage: 'Stage 2',
+                    rating: 3,
+                    genre: 'Stand-Up Comedy',
+                    country: 'Australia/UK',
+                    soundsLike: 'Live At The Apollo, Mock the Week',
+                    description: 'A stand-up comedy showcase featuring Felicity Ward (Australian comic, Mock the Week, Live at the Apollo), Mark Watson and Matt Bragg.',
+                    reason: 'A fun change of pace from the music - genuinely funny lineup.',
+                    duration: '60 mins'
+                },
+                {
+                    id: 'sun-16',
+                    name: 'The Bridge',
+                    start: '11:00',
+                    end: '11:45',
+                    stage: 'Club Corner',
+                    rating: 2,
+                    genre: 'Folk Collective',
+                    country: 'UK',
+                    soundsLike: 'Community folk collectives',
+                    description: 'Community folk showcase in the intimate Club Corner setting.',
+                    reason: 'Relaxed morning start away from the main stages.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sun-17',
+                    name: 'Royston Live Folk Club',
+                    start: '14:30',
+                    end: '15:15',
+                    stage: 'Club Corner',
+                    rating: 2,
+                    genre: 'Folk Club Session',
+                    country: 'UK',
+                    soundsLike: 'Local folk club nights',
+                    description: 'Royston\'s own folk club bringing their regular night to the festival.',
+                    reason: 'Cosy, sociable alternative to the main stages.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sun-18',
+                    name: 'Black Fen Folk Club',
+                    start: '18:00',
+                    end: '18:45',
+                    stage: 'Club Corner',
+                    rating: 2,
+                    genre: 'Folk Club Session',
+                    country: 'UK',
+                    soundsLike: 'Local folk club nights',
+                    description: 'Black Fen\'s folk club night, bringing informal music and song to Club Corner.',
+                    reason: 'A warm community close to the festival\'s end.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sun-19',
+                    name: 'Northumbrian Pipers',
+                    start: '11:45',
+                    end: '12:30',
+                    stage: 'Flower Garden',
+                    rating: 3,
+                    genre: 'Traditional Piping',
+                    country: 'England',
+                    soundsLike: 'Northumbrian smallpipes traditions',
+                    description: 'Traditional Northumbrian smallpipes music in the peaceful Flower Garden setting.',
+                    reason: 'A beautiful, distinctive traditional sound rarely heard elsewhere.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sun-20',
+                    name: 'Singing Sessions with Black Fen',
+                    start: '13:45',
+                    end: '14:30',
+                    stage: 'Flower Garden',
+                    rating: 2,
+                    genre: 'Participatory Singing',
+                    country: 'UK',
+                    soundsLike: 'Community singing sessions',
+                    description: 'Join Black Fen for an informal, participatory singing session.',
+                    reason: 'Fun, relaxed way to join in rather than just watch.',
+                    duration: '45 mins'
+                },
+                {
+                    id: 'sun-21',
+                    name: 'English Session with Tim Mellor',
+                    start: '17:15',
+                    end: '18:00',
+                    stage: 'Flower Garden',
+                    rating: 2,
+                    genre: 'Traditional Singing Session',
+                    country: 'UK',
+                    soundsLike: 'Traditional English singing sessions',
+                    description: 'A relaxed traditional English singing session led by Tim Mellor.',
+                    reason: 'Lovely, low-key way to unwind before the evening headliners.',
+                    duration: '45 mins'
+                }
+            ]
+        };
+
+        // Real festival calendar dates, keyed to match the schedule's day labels
+        const DAY_DATES = {
+            'Saturday 1 August': '2026-08-01',
+            'Sunday 2 August': '2026-08-02'
+        };
+
+        function todayStr() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        let state = {
+            // Yes/Maybe/No are independent toggles, combinable in any mix. "All" is a derived
+            // shortcut, not real state - it just reflects whether all three happen to be on.
+            filters: { yes: true, maybe: true, no: true },
+            selections: {},
+            notes: {},
+            currentTime: new Date(),
+            searchQuery: '',
+            notificationsSent: {},
+            // Default to today's festival day if we're on-site, otherwise the first day
+            activeDay: Object.keys(DAY_DATES).find(d => DAY_DATES[d] === todayStr()) || Object.keys(schedule)[0]
+        };
+
+        // Load state from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('festivalState');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state.selections = parsed.selections || {};
+                state.notes = parsed.notes || {};
+            }
+        }
+
+        // Save state to localStorage - counts/filter badges are recomputed by the render() that always follows
+        function saveState() {
+            localStorage.setItem('festivalState', JSON.stringify({
+                selections: state.selections,
+                notes: state.notes
+            }));
+        }
+
+
+        // Convert "HH:MM" to minutes since midnight
+        function toMinutes(t) {
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        // Find the earliest start / latest end (rounded to the hour) for a day's acts
+        function computeDayRange(artists) {
+            let min = Infinity, max = -Infinity;
+            artists.forEach(a => {
+                const s = toMinutes(a.start), e = toMinutes(a.end);
+                if (s < min) min = s;
+                if (e > max) max = e;
+            });
+            return { min: Math.floor(min / 60) * 60, max: Math.ceil(max / 60) * 60 };
+        }
+
+        // Build a colour-coded visual timeline for a day: one column per stage,
+        // each act shown as a block positioned top-to-bottom by its actual time slot.
+        function renderTimeline(artists, dateStr) {
+            const stages = [...new Set(artists.map(a => a.stage))];
+            const { min, max } = computeDayRange(artists);
+            const pxPerMin = 0.8;
+            const trackHeight = (max - min) * pxPerMin;
+
+            let rulerHtml = '';
+            for (let t = min; t <= max; t += 60) {
+                const top = (t - min) * pxPerMin;
+                const hh = String(Math.floor(t / 60)).padStart(2, '0');
+                rulerHtml += `<div class="timeline-vruler-label" style="top:${top}px">${hh}:00</div><div class="timeline-vruler-tick" style="top:${top}px"></div><div class="timeline-vgridline" style="top:${top}px"></div>`;
+            }
+
+            const colsHtml = stages.map(stage => {
+                const blocksHtml = artists.filter(a => a.stage === stage).map(a => {
+                    const s = toMinutes(a.start), e = toMinutes(a.end);
+                    const top = (s - min) * pxPerMin;
+                    const height = Math.max((e - s) * pxPerMin, 28);
+                    const status = state.selections[a.id] || 'none';
+                    const note = state.notes[a.id];
+                    const notesLine = note ? `<div class="tvb-notes">📝 ${note}</div>` : '';
+                    const dimmed = !matchesFilter(a) ? ' dimmed' : '';
+                    return `<div class="timeline-vblock status-${status}${dimmed}" style="top:${top}px;height:${height}px" data-target="${a.id}" title="${a.name} (${a.start}-${a.end})${note ? ' — ' + note : ''}">
+                        <div class="tvb-name">${a.name}</div>
+                        <div class="tvb-time">${a.start}-${a.end}</div>
+                        ${notesLine}
+                    </div>`;
+                }).join('');
+                return `<div class="timeline-vcol">${blocksHtml}</div>`;
+            }).join('');
+
+            // Live "NOW" marker - only drawn when this timeline's date is today and the time falls in range
+            let nowLineHtml = '';
+            if (dateStr === todayStr()) {
+                const now = new Date();
+                const nowMin = now.getHours() * 60 + now.getMinutes();
+                if (nowMin >= min && nowMin <= max) {
+                    const top = (nowMin - min) * pxPerMin;
+                    nowLineHtml = `<div class="timeline-now-line" style="top:${top}px"><span class="timeline-now-label">NOW</span></div>`;
+                }
+            }
+
+            return `
+                <div class="timeline-vwrap">
+                    <div class="timeline-vheader">
+                        <div class="timeline-vheader-spacer"></div>
+                        ${stages.map(s => `<div class="timeline-vcol-title">${s}</div>`).join('')}
+                    </div>
+                    <div class="timeline-vbody" style="height:${trackHeight}px">
+                        <div class="timeline-vruler">${rulerHtml}</div>
+                        ${colsHtml}
+                        ${nowLineHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Tally of Yes/Maybe/No for just the given day's lineup, used for the filter button badges
+        function getCounts(artists) {
+            const counts = { yes: 0, maybe: 0, no: 0 };
+            artists.forEach(a => {
+                const selection = state.selections[a.id];
+                if (counts.hasOwnProperty(selection)) counts[selection]++;
+            });
+            return counts;
+        }
+
+        // The Yes/Maybe acts still to come for a given day's lineup, earliest first.
+        // On today's actual festival date, picks whose start time has already passed are skipped
+        // in favor of the next upcoming ones. On any other day (past or future), the full pick list.
+        function getUpcomingPick(artists, dateStr) {
+            const picks = artists
+                .filter(a => ['yes', 'maybe'].includes(state.selections[a.id]))
+                .sort((a, b) => toMinutes(a.start) - toMinutes(b.start));
+            if (picks.length === 0) return { pick: null, andThen: null, allStarted: false };
+
+            let upcoming = picks;
+            if (dateStr === todayStr()) {
+                const now = new Date();
+                const nowMin = now.getHours() * 60 + now.getMinutes();
+                const startIdx = picks.findIndex(a => toMinutes(a.start) > nowMin);
+                upcoming = startIdx === -1 ? [] : picks.slice(startIdx);
+            }
+
+            return {
+                pick: upcoming[0] || null,
+                andThen: upcoming[1] || null,
+                allStarted: upcoming.length === 0
+            };
+        }
+
+        // Render schedule - only the currently active day, selected via the day-tabs
+        function render() {
+            const container = document.getElementById('schedule');
+            let html = '';
+
+            document.querySelectorAll('.day-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.day === state.activeDay);
+            });
+
+            {
+                const day = state.activeDay;
+                const artists = schedule[day];
+                const dateStr = DAY_DATES[day];
+                const counts = getCounts(artists);
+                const { pick, andThen, allStarted } = getUpcomingPick(artists, dateStr);
+
+                const nowCluster = `<div class="pick-now"><button class="action-btn" id="now-playing-btn">Now</button></div>`;
+
+                let pickBoxHtml;
+                if (pick) {
+                    const andThenHtml = andThen
+                        ? `<div class="pick-info">➡️ And then: <strong>${andThen.start}</strong> — ${andThen.name} (${andThen.stage}) ${state.selections[andThen.id] === 'yes' ? '✅' : '🤔'}</div>`
+                        : '';
+                    pickBoxHtml = `<div class="first-pick-box">
+                        <div class="pick-lines">
+                            <div class="pick-info">🎯 Next pick: <strong>${pick.start}</strong> — ${pick.name} (${pick.stage}) ${state.selections[pick.id] === 'yes' ? '✅' : '🤔'}</div>
+                            ${andThenHtml}
+                        </div>
+                        ${nowCluster}
+                    </div>`;
+                } else if (allStarted) {
+                    pickBoxHtml = `<div class="first-pick-box first-pick-empty"><div class="pick-info">No more picks left today</div>${nowCluster}</div>`;
+                } else {
+                    pickBoxHtml = `<div class="first-pick-box first-pick-empty"><div class="pick-info">No Yes/Maybe picks yet for this day</div>${nowCluster}</div>`;
+                }
+
+                const allActive = state.filters.yes && state.filters.maybe && state.filters.no;
+
+                html += `<div class="day-section">
+                    <div class="sticky-day-header">
+                        <div class="day-title">${day}</div>
+                        <div class="filter-tabs">
+                            <button class="filter-btn ${allActive ? 'active' : ''}" data-filter="all">All</button>
+                            <button class="filter-btn ${state.filters.yes ? 'active' : ''}" data-filter="yes">✅ Yes <span>${counts.yes}</span></button>
+                            <button class="filter-btn ${state.filters.maybe ? 'active' : ''}" data-filter="maybe">🤔 Maybe <span>${counts.maybe}</span></button>
+                            <button class="filter-btn ${state.filters.no ? 'active' : ''}" data-filter="no">🔴 No <span>${counts.no}</span></button>
+                        </div>
+                        ${pickBoxHtml}
+                    </div>
+                    ${renderTimeline(artists, dateStr)}
+                </div>`;
+            }
+
+            container.innerHTML = html;
+            attachEventListeners();
+            syncStickyOffsets();
+        }
+
+        // Whether a single artist matches the active filter toggles + search box.
+        // Non-matches aren't removed from view - see the "dimmed" class in render()/renderTimeline().
+        function matchesFilter(artist) {
+            if (state.searchQuery) {
+                const query = state.searchQuery.toLowerCase();
+                if (!artist.name.toLowerCase().includes(query) &&
+                    !artist.genre.toLowerCase().includes(query) &&
+                    !artist.description.toLowerCase().includes(query)) {
+                    return false;
+                }
+            }
+
+            const selection = state.selections[artist.id] || 'none';
+            if (selection === 'yes') return state.filters.yes;
+            if (selection === 'maybe') return state.filters.maybe;
+            if (selection === 'no') return state.filters.no;
+            return true; // undecided artists aren't gated by the Yes/Maybe/No toggles
+        }
+
+        // Request notification permissions
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        // Show notification
+        function showNotification(artist, minutesBefore = 10) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(`${artist.name} in ${minutesBefore} minutes!`, {
+                    body: `${artist.start} - ${artist.end} at ${artist.stage}`,
+                    icon: '🎵'
+                });
+            }
+        }
+
+        // Check for upcoming performances
+        function checkUpcomingPerformances() {
+            const now = new Date();
+            let upcomingCount = 0;
+
+            Object.entries(schedule).forEach(([day, artists]) => {
+                const [year, month, dayNum] = DAY_DATES[day].split('-').map(Number);
+
+                artists.forEach(artist => {
+                    if (state.selections[artist.id] !== 'yes') return;
+
+                    const [startH, startM] = artist.start.split(':').map(Number);
+                    const startTime = new Date(year, month - 1, dayNum, startH, startM);
+                    const minutesUntil = (startTime - now) / 60000;
+
+                    if (minutesUntil > 0 && minutesUntil <= 10.5 && !state.notificationsSent[artist.id]) {
+                        showNotification(artist, Math.round(minutesUntil));
+                        state.notificationsSent[artist.id] = true;
+                        upcomingCount++;
+                    }
+                });
+            });
+
+            const badge = document.getElementById('notification-badge');
+            if (upcomingCount > 0) {
+                badge.textContent = upcomingCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // WMO weather codes (used by Open-Meteo) mapped to an icon + short label
+        function weatherFromCode(code) {
+            const map = {
+                0: ['☀️', 'Clear'], 1: ['🌤️', 'Mostly clear'], 2: ['⛅', 'Partly cloudy'], 3: ['☁️', 'Overcast'],
+                45: ['🌫️', 'Fog'], 48: ['🌫️', 'Fog'],
+                51: ['🌦️', 'Light drizzle'], 53: ['🌦️', 'Drizzle'], 55: ['🌦️', 'Heavy drizzle'],
+                56: ['🌧️', 'Freezing drizzle'], 57: ['🌧️', 'Freezing drizzle'],
+                61: ['🌧️', 'Light rain'], 63: ['🌧️', 'Rain'], 65: ['🌧️', 'Heavy rain'],
+                66: ['🌧️', 'Freezing rain'], 67: ['🌧️', 'Freezing rain'],
+                71: ['🌨️', 'Light snow'], 73: ['🌨️', 'Snow'], 75: ['🌨️', 'Heavy snow'], 77: ['🌨️', 'Snow grains'],
+                80: ['🌦️', 'Rain showers'], 81: ['🌦️', 'Rain showers'], 82: ['⛈️', 'Violent showers'],
+                85: ['🌨️', 'Snow showers'], 86: ['🌨️', 'Snow showers'],
+                95: ['⛈️', 'Thunderstorm'], 96: ['⛈️', 'Thunderstorm + hail'], 99: ['⛈️', 'Thunderstorm + hail']
+            };
+            return map[code] || ['🌡️', 'Forecast'];
+        }
+
+        function applyWeather(prefix, day) {
+            if (!day) { applyWeatherUnavailable(prefix); return; }
+            const [icon, desc] = weatherFromCode(day.code);
+            document.getElementById(`weather-icon-${prefix}`).textContent = icon;
+            document.getElementById(`weather-desc-${prefix}`).textContent = `${day.min}°-${day.max}°C · ${desc}`;
+        }
+
+        function applyWeatherUnavailable(prefix) {
+            document.getElementById(`weather-icon-${prefix}`).textContent = '🌐';
+            document.getElementById(`weather-desc-${prefix}`).textContent = 'Forecast unavailable';
+        }
+
+        // Real forecast for Cherry Hinton Hall, Cambridge, via Open-Meteo (free, no API key required).
+        // Only has data within its forecast window (~16 days out) - falls back to "unavailable" outside that.
+        async function fetchWeather() {
+            const lat = 52.184, lon = 0.148;
+            const dates = Object.values(DAY_DATES);
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe/London&start_date=${dates[0]}&end_date=${dates[dates.length - 1]}`;
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Weather request failed');
+                const data = await res.json();
+                if (!data.daily || !data.daily.time) throw new Error('No forecast data');
+
+                const byDate = {};
+                data.daily.time.forEach((date, i) => {
+                    byDate[date] = {
+                        code: data.daily.weathercode[i],
+                        max: Math.round(data.daily.temperature_2m_max[i]),
+                        min: Math.round(data.daily.temperature_2m_min[i])
+                    };
+                });
+
+                applyWeather('sat', byDate[DAY_DATES['Saturday 1 August']]);
+                applyWeather('sun', byDate[DAY_DATES['Sunday 2 August']]);
+            } catch (err) {
+                applyWeatherUnavailable('sat');
+                applyWeatherUnavailable('sun');
+            }
+        }
+
+        // Re-bound after every render() call, since #schedule's contents are fully
+        // regenerated each time. Header controls (and the sheet's own controls) are static
+        // and wired once elsewhere instead - see attachStaticListeners() and openArtistSheet().
+        function attachEventListeners() {
+            // Timeline blocks - tap to open the artist's detail sheet
+            document.querySelectorAll('.timeline-vblock').forEach(block => {
+                block.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const artist = findArtistById(block.dataset.target);
+                    if (artist) openArtistSheet(artist);
+                });
+            });
+
+            // Filter tabs - Yes/Maybe/No toggle independently; "All" is a shortcut that turns all three on.
+            // Regenerated with fresh counts on every render(), same as the timeline blocks above.
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const key = btn.dataset.filter;
+                    if (key === 'all') {
+                        state.filters.yes = true;
+                        state.filters.maybe = true;
+                        state.filters.no = true;
+                    } else {
+                        state.filters[key] = !state.filters[key];
+                    }
+                    // Selecting a filter clears any active search, so the two don't fight over what's dimmed
+                    state.searchQuery = '';
+                    const searchInput = document.getElementById('search-input');
+                    if (searchInput) searchInput.value = '';
+                    render();
+                });
+            });
+
+            // "Now Playing" jumps to the live marker on the timeline. Lives on the pick box now,
+            // so - like the filter tabs above - it's regenerated each render() and rebound here rather
+            // than in attachStaticListeners(). scrollIntoView doesn't account for the sticky header's
+            // height when aligning an element's top, so it can leave the target partly hidden underneath
+            // it - compute the scroll offset manually instead for a reliable result.
+            const nowBtn = document.getElementById('now-playing-btn');
+            if (nowBtn) {
+                nowBtn.addEventListener('click', () => {
+                    // Two sticky layers sit above the scrolling content now: the main header,
+                    // and the day-title/filter-tabs/pick-box group stuck right below it. Both
+                    // need to be subtracted, or the target lands hidden underneath the second one.
+                    const header = document.querySelector('.header');
+                    const stickyDayHeader = document.querySelector('.sticky-day-header');
+                    const stuckHeight = (header ? header.offsetHeight : 0) + (stickyDayHeader ? stickyDayHeader.offsetHeight : 0);
+                    const nowLine = document.querySelector('.timeline-now-line');
+
+                    if (nowLine) {
+                        const rect = nowLine.getBoundingClientRect();
+                        const visibleHeight = window.innerHeight - stuckHeight;
+                        const targetY = window.scrollY + rect.top - stuckHeight - (visibleHeight / 2);
+                        window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+                        return;
+                    }
+
+                    const wrap = document.querySelector('.timeline-vwrap');
+                    if (wrap) {
+                        const rect = wrap.getBoundingClientRect();
+                        const targetY = window.scrollY + rect.top - stuckHeight - 8;
+                        window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+                    }
+                });
+            }
+        }
+
+        // Wired once at init, not on every render() - these controls live in the
+        // static header/day-tabs markup and are never removed or recreated.
+        function attachStaticListeners() {
+            document.querySelectorAll('.day-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.activeDay = btn.dataset.day;
+                    render();
+                });
+            });
+
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                render();
+            });
+
+            document.getElementById('notification-btn').addEventListener('click', () => {
+                requestNotificationPermission();
+            });
+        }
+
+        // Look up an artist's full record by id across both festival days
+        function findArtistById(id) {
+            for (const day in schedule) {
+                const found = schedule[day].find(a => a.id === id);
+                if (found) return found;
+            }
+            return null;
+        }
+
+        // Open the bottom sheet with an artist's full detail
+        function openArtistSheet(artist) {
+            const selection = state.selections[artist.id] || 'none';
+            const notes = state.notes[artist.id] || '';
+
+            document.getElementById('sheet-content').innerHTML = `
+                <div class="sheet-time">${artist.start} - ${artist.end} · ${artist.stage}</div>
+                <div class="sheet-title">${artist.name}</div>
+
+                <div class="status-cycle sheet-status">
+                    <button class="status-btn ${selection === 'yes' ? 'active' : ''}" data-status="yes">Yes</button>
+                    <button class="status-btn ${selection === 'maybe' ? 'active' : ''}" data-status="maybe">Maybe</button>
+                    <button class="status-btn ${selection === 'no' ? 'active' : ''}" data-status="no">No</button>
+                </div>
+
+                <div class="sheet-desc">${artist.description}</div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Genre</span>
+                    <span class="detail-value">${artist.genre}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Country</span>
+                    <span class="detail-value">${artist.country}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Sounds Like</span>
+                    <span class="detail-value">${artist.soundsLike}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Why Worth Seeing</span>
+                    <span class="detail-value">${artist.reason}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duration</span>
+                    <span class="detail-value">${artist.duration}</span>
+                </div>
+
+                <div class="notes-section">
+                    <div class="notes-label">📝 Notes</div>
+                    <textarea class="notes-input" placeholder="Add personal notes...">${notes}</textarea>
+                </div>
+            `;
+
+            // Yes/Maybe/No inside the sheet - re-render the page behind it, then refresh
+            // this sheet in place so the active state updates without closing it
+            document.querySelectorAll('#sheet-content .status-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const status = btn.dataset.status;
+                    const current = state.selections[artist.id];
+                    state.selections[artist.id] = current === status ? 'none' : status;
+                    saveState();
+                    render();
+                    checkUpcomingPerformances();
+                    openArtistSheet(artist);
+                });
+            });
+
+            // Notes textarea inside the sheet
+            const sheetNotesInput = document.querySelector('#sheet-content .notes-input');
+            sheetNotesInput.addEventListener('change', () => {
+                state.notes[artist.id] = sheetNotesInput.value;
+                saveState();
+            });
+
+            document.getElementById('sheet-overlay').classList.add('show');
+            document.getElementById('bottom-sheet').classList.add('show');
+        }
+
+        function closeSheet() {
+            document.getElementById('sheet-overlay').classList.remove('show');
+            document.getElementById('bottom-sheet').classList.remove('show');
+        }
+
+        // Sheet close controls - wired once since the sheet markup itself is static, not re-rendered
+        document.getElementById('sheet-overlay').addEventListener('click', closeSheet);
+        document.getElementById('sheet-close').addEventListener('click', closeSheet);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSheet();
+        });
+
+        // Keeps the sticky day-header group's offset matched to the header's real (dynamic)
+        // height, so it docks flush below it - with only the timeline scrolling underneath -
+        // instead of relying on a stale hardcoded value. Day-title/filter-tabs/first-pick-box
+        // are all one sticky unit now (.sticky-day-header), so this is the only offset needed.
+        function syncStickyOffsets() {
+            const header = document.querySelector('.header');
+            document.documentElement.style.setProperty('--header-height', (header ? header.offsetHeight : 0) + 'px');
+        }
+
+        // Initialize
+        loadState();
+        attachStaticListeners();
+        render();
+        syncStickyOffsets();
+        fetchWeather().then(syncStickyOffsets);
+        checkUpcomingPerformances();
+        window.addEventListener('resize', syncStickyOffsets);
+
+        // Update "now playing" every minute
+        setInterval(() => {
+            state.currentTime = new Date();
+            render();
+        }, 60000);
+
+        // Check for upcoming performances every minute
+        setInterval(checkUpcomingPerformances, 60000);
+    </script>
+</body>
+</html>
